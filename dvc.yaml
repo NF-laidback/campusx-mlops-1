@@ -1,0 +1,43 @@
+# dvc.yaml
+stages:
+  data_ingestion:
+    cmd: python notebooks/data/data_ingestion.py
+    deps:
+      - notebooks/data/data_ingestion.py
+    params:
+      - data_ingestion.test_size
+    outs:
+      - data/raw
+  data_preprocessing:
+    cmd: python notebooks/data/data_preprocessing.py
+    deps:
+      - data/raw
+      - notebooks/data/data_preprocessing.py
+    outs:
+      - data/interim
+  feature_engineering:
+    cmd: python notebooks/features/feature_engineering.py
+    deps:
+      - data/interim
+      - notebooks/features/feature_engineering.py
+    params:
+      - feature_engineering.max_features
+    outs:
+      - data/processed
+  model_building:
+    cmd: python notebooks/model/model_building.py
+    deps:
+      - data/processed
+      - notebooks/model/model_building.py
+    params:
+      - model_building.n_estimators
+      - model_building.learning_rate
+    outs:
+      - models/model.pkl
+  model_evaluation:
+    cmd: python notebooks/model/model_evaluation.py
+    deps:
+      - models/model.pkl
+      - notebooks/model/model_evaluation.py
+    metrics:
+      - reports/metrics.json
